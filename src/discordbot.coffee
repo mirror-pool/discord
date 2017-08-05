@@ -10,9 +10,12 @@ class _DiscordMirror extends MirrorPool.Mirror
 		discordMessage.channel.id is @channel.id
 
 	inputToMessage: (discordMessage) ->
+		text = @cleanCustomEmoji discordMessage.cleanContent
+		attachmentsString \
+			= @attachmentsToString discordMessage.attachments
 		Promise.resolve {
 			sender: (@findName discordMessage),
-			text: (@cleanCustomEmoji discordMessage.cleanContent),
+			text: (text + attachmentsString),
 		}
 
 	findName: (discordMessage) ->
@@ -25,6 +28,19 @@ class _DiscordMirror extends MirrorPool.Mirror
 				author.username
 		else
 			author.username
+
+	attachmentsToString: (attachments) ->
+		if attachments
+			attachmentArray = Array.from attachments.values()
+			if attachmentArray.length > 0
+				str = '\n\nAttachments:\n'
+				str += attachment.url + '\n' \
+				for attachment in attachmentArray
+				str
+			else
+				''
+		else
+			''
 
 	cleanCustomEmoji: (messageText) ->
 		messageText.replace /<:(\w+):\d+>/g, ':$1:'
