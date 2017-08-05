@@ -11,9 +11,20 @@ class _DiscordMirror extends MirrorPool.Mirror
 
 	inputToMessage: (discordMessage) ->
 		Promise.resolve {
-			sender: discordMessage.author.username,
-			text: @cleanCustomEmoji discordMessage.cleanContent,
+			sender: (@findName discordMessage),
+			text: (@cleanCustomEmoji discordMessage.cleanContent),
 		}
+
+	findName: (discordMessage) ->
+		author = discordMessage.author
+		if @channel.guild
+			member = @channel.guild.members.get author.id
+			if member and member.nickname
+				member.nickname
+			else
+				author.username
+		else
+			author.username
 
 	cleanCustomEmoji: (messageText) ->
 		messageText.replace /<:(\w+):\d+>/g, ':$1:'
